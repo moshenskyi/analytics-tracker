@@ -4,6 +4,15 @@ plugins {
     id 'maven-publish'
 }
 
+//apply {
+//    from(rootProject.file("./scripts/publish.gradle"))
+//}
+
+def major = 0
+def minor = 0
+def patch = 0
+extensions.add("libraryVersion", "$major.$minor.$patch")
+
 android {
     compileSdk 31
 
@@ -36,4 +45,18 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.7.0'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+
+                groupId = 'com.github.JoelKanyi'
+                artifactId = 'kenyan-counties'
+                version = '1.0.0'
+            }
+        }
+    }
 }

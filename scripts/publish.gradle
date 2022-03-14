@@ -1,0 +1,18 @@
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'maven-publish'
+
+project.afterEvaluate {
+
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+
+                groupId = packageName
+                artifactId = "${project.getName()}"
+                version = libraryVersion
+            }
+        }
+    }
+
+}
