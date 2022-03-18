@@ -17,7 +17,7 @@ project.afterEvaluate {
         publications {
             releaseAar(MavenPublication) {
                 groupId = 'com.moshenskyi.analytics-tracker'
-                artifactId = "${project.getName()}"
+                artifactId = "tracker"
                 version = libraryVersion
                 artifact sourceJar
                 artifact bundleReleaseAar
