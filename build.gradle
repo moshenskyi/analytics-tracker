@@ -17,5 +17,3 @@ buildscript {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
-
-//apply plugin: "com.jfrog.artifactory"
