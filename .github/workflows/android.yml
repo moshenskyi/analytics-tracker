@@ -2,35 +2,29 @@ name: Android CI
 
 on:
   push:
+    branches:
+      - develop
     tags:
       - 'v*'
 
 
 jobs:
-
-  release:
-    name: Create Release
+  Gradle:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: checkout code
         uses: actions/checkout@v2
-
-      - name: Set release name
-        run: echo ::set-env name=RELEASE_NAME::$(echo ${GITHUB_REF:11})
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: setup jdk
+        uses: actions/setup-java@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ env.RELEASE_NAME }}
-          body: |
-            What is new :
-              - First Change
-              - Second Change
-          draft: false
-          prerelease: false
+          java-version: 11
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+      - name: Releasing using Hub
+        uses: kyze8439690/action-release-releaseapk@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.ANALYTICS_TOKEN }}
+          APP_FOLDER: app
 
