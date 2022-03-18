@@ -1,18 +1,65 @@
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 
-project.afterEvaluate {
+def major = 0
+def minor = 1
+def patch = 0
+def libraryVersion = "$major.$minor.$patch"
 
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    archiveClassifier.set("sources")
+}
+
+project.afterEvaluate {
+    artifactoryPublish.dependsOn('build')
     publishing {
         publications {
-            release(MavenPublication) {
-                from components.release
-
-                groupId = packageName
+            releaseAar(MavenPublication) {
+                groupId = 'com.moshenskyi.analytics-tracker'
                 artifactId = "${project.getName()}"
                 version = libraryVersion
+                artifact sourceJar
+                artifact bundleReleaseAar
+
+                pom {
+                    withXml(createPomDependencies(["implementation", "api"]))
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                def propsFile = rootProject.file('.github.properties')
+                def props = new Properties()
+                props.load(new FileInputStream(propsFile))
+
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/moshenskyi/analytics-tracker")
+
+                credentials {
+                    username props['username']
+                    password props['token']
+                }
+            }
+        }
+
+    }
+}
+
+def createPomDependencies(configurationNames) {
+    return {
+        def dependenciesNode = asNode().appendNode('dependencies')
+
+        configurationNames.each { configurationName ->
+            configurations[configurationName].allDependencies.each {
+                if (it.group != null && it.name != null && it.version != "unspecified") return
+
+                def dependencyNode = dependenciesNode.appendNode('dependency')
+                dependencyNode.appendNode('groupId', it.group)
+                dependencyNode.appendNode('artifactId', it.name)
+                dependencyNode.appendNode('version', it.version)
             }
         }
     }
-
 }
