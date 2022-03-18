@@ -6,6 +6,7 @@ dependencyResolutionManagement {
         jcenter() // Warning: this repository is going to shut down soon
     }
 }
+
 rootProject.name = "Analytics"
-include ':sample'
-include ':analytics-tracler'
+
+include ':sample', ':analytics-tracker'
